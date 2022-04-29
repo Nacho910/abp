@@ -1,10 +1,12 @@
+from multiprocessing import context
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 
+
 from .models import Profesor
-from .forms import ProfesorForm
+from .forms import ProfesorForm, UserRegistrationForm
 
 # Create your views here.
 def index (request):
@@ -46,3 +48,18 @@ def register(request):
             form.save()
             return HttpResponse('Usuario creado correctamente')
     return render(request, 'ruta/register.html', {'form': form})"""
+
+def register(request):
+    if request.method == 'POST':    
+        form = UserRegistrationForm(request.POST)   
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data['username']
+            messages.success(request, f'Cuenta {username} creada exitosamente.')
+            return redirect('login')
+    else:
+        form = UserRegistrationForm()
+
+    context = {'form': form}
+
+    return render(request, 'ruta/register.html', context)
